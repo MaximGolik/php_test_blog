@@ -7,6 +7,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "doctrine/doctrine-migrations-bundle": "^3.3",
+        "doctrine/migrations": "^3.8",
+        "doctrine/orm": "^3.3",
+        "laravel-doctrine/orm": "^3.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
