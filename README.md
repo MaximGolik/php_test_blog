@@ -17,4 +17,4 @@
 Первый запуск
 
 2. Открыть контейнер `docker exec -it laravel_app bash`
-3. Выполнить миграции `php artisan php artisan migrate`
+3. Выполнить миграции `php artisan migrate`
