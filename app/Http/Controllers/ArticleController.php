@@ -9,10 +9,9 @@ use Illuminate\Http\Request;
 use App\Entities\User;
 use Illuminate\Support\Facades\Auth;
 
-//todo добить до конца в контроллеарх (логин, пользователь, статьи) все запросы на doctrine orm
+#todo вынести всю валидацию и обработку ошибок
 class ArticleController
 {
-
     private $entityManager;
     public function __construct(EntityManagerInterface $entityManager)
     {
