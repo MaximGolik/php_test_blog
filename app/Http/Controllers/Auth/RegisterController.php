@@ -12,23 +12,27 @@ class RegisterController
 {
     // метод для регистрации пользователя
 
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
+
     // Конструктор контроллера для внедрения зависимости EntityManager
+    #todo привести конструктор к новому формату
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         // валидация пароля и имени пользователя
         #todo вынести в сервис
-        $validation = Validator::make($request->all(),[
+        $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password'=>'required|min:6|string',
+            'password' => 'required|min:6|string',
         ]);
-        if($validation->fails()){
-            return response()->json(['errors'=>$validation->errors()], 400);
+
+        if ($validation->fails()) {
+            return response()->json(['errors' => $validation->errors()], 400);
         }
 
         // создаем пользователя
@@ -43,7 +47,7 @@ class RegisterController
         $this->entityManager->flush();
 
         return response()->json([
-            'user'=>$user->getUserInfo(),
+            'user' => $user->getUserInfo(),
         ], 201);
     }
 }

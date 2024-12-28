@@ -11,9 +11,12 @@ use App\Http\Controllers\ArticleController;
 //    return $request->user();
 //})->middleware('auth:sanctum');
 
+#todo подумать куда можно деть singleton и adapter
+
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'login']);
 
+#todo сюда вынести валидацию
 //todo добавил кастомный фильтр check-token, разобраться как их заставить работать вместе с auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
     // crud пользователей
