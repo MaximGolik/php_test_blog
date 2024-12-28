@@ -1,46 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Exceptions\UserNotFoundException;
 use App\Services\UserService;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use Doctrine\ORM\EntityManagerInterface;
-use Illuminate\Http\Request;
-use App\Entities\User;
+use Illuminate\Http\JsonResponse as JsonResponse;
 
 class UserController
 {
+    private UserService $userService;
 
-    private $entityManager;
-    private $userService;
-
-    public function __construct(EntityManagerInterface $entityManager, UserService $userService)
+    public function __construct(UserService $userService)
     {
-        $this->entityManager = $entityManager;
         $this->userService = $userService;
     }
 
-    public function update(Request $request, $id)
+    public function update(array $validatedData, $id): JsonResponse
     {
         try{
             $user = $this->userService->findUserById($id);
+            $this->userService->updateUser($validatedData,$user);
 
-            #todo вынести в сервис
-            $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|min:6|string',
-            ]);
-            $validatedData['password'] = bcrypt($validatedData['password']);
-
-            $user->setName($validatedData['name']);
-            $user->setEmail($validatedData['email']);
-            $user->setPassword($validatedData['password']);
-
-            $this->entityManager->flush(); // Сохранить изменения в базе данных
-
-            #todo разобраться почему вместо сообщения об успехе, кидает страницу ларавеля
             return response()->json(['message' => 'User updated successfully', 'user' => $user->getUserInfo()]);
         }
         catch (UserNotFoundException $e){
@@ -48,22 +30,18 @@ class UserController
         }
     }
 
-    public function delete($id)
+    public function delete($id): JsonResponse
     {
         try {
             $user = $this->userService->findUserById($id);
-
-            #todo вынести в сервис
-            $this->entityManager->remove($user);
-            $this->entityManager->flush();
-
+            $this->userService->deleteUser($user);
             return response()->json(['message' => 'User deleted successfully']);
         } catch (UserNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode());
         }
     }
 
-    public function get($id)
+    public function get($id): JsonResponse
     {
         try {
             $user = $this->userService->findUserById($id);

@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse as JsonResponse;
 
 class LoginController
 {
-    #todo вынести в сервис
-    public function login(Request $request){
+    public function login(Request $request): JsonResponse
+    {
         $credentials = $request->only('email', 'password');
-
 
         if(Auth::attempt($credentials)){
             $user = Auth::user();

@@ -1,66 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-
-use App\Entities\Article;
 use App\Exceptions\ArticleAccessDeniedException;
 use App\Exceptions\ArticleNotFoundException;
-use App\Exceptions\ArticleValidationException;
-use Doctrine\ORM\EntityManagerInterface;
-use Illuminate\Http\Request;
-use App\Entities\User;
+use App\Exceptions\UserNotFoundException;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse as JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ArticleService;
 
-#todo вынести всю валидацию и обработку ошибок
+#todo вынести всю обработку ошибок
 class ArticleController
 {
-    private EntityManagerInterface $entityManager;
     private ArticleService $articleService;
+    private UserService $userService;
 
-    public function __construct(EntityManagerInterface $entityManager, ArticleService $articleValidationService)
+    public function __construct(
+        ArticleService $articleService,
+        UserService    $userService)
     {
-        $this->entityManager = $entityManager;
-        $this->articleService = $articleValidationService;
+        $this->articleService = $articleService;
+        $this->userService = $userService;
     }
 
-    // все статьи
-    public function index()
+    public function index(): JsonResponse
     {
         $articles = $this->articleService->getAllArticles();
         return response()->json(['articles' => $articles]);
     }
 
-    // добавить статью
-    public function add()
+    public function add(array $validatedData): JsonResponse
     {
-        #todo вынести код с пользователем отсюда в сервис, поиск по токену
-        $user = $this->entityManager->find(User::class, Auth::id());
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
         try {
-            $validatedData = $this->articleService->validateArticle(request()->all());
-        } catch (ArticleValidationException $e) {
-            return response()->json(['errors' => $e->getErrors()->toArray()], 400);
+            $user = $this->userService->findUserById(Auth::id());
+        } catch (UserNotFoundException $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode());
         }
 
-        $article = new Article();
-        $article->setTitle($validatedData['title']);
-        $article->setContent($validatedData['content']);
-        $article->setUser($user);
-
-        #todo вынести в сервис
-        $this->entityManager->persist($article);
-        $this->entityManager->flush();
+        $article = $this->articleService->createArticle($validatedData, $user);
 
         return response()->json(['message' => 'Article added', 'article' => $article->getArticleInfo()]);
     }
 
-    // получить статью
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         try {
             $article = $this->articleService->findArticleById($id);
@@ -70,42 +55,29 @@ class ArticleController
         }
     }
 
-    // изменить статью
-    public function update($id)
+    public function update(int $id, array $validatedData): JsonResponse
     {
         try {
             $article = $this->articleService->findArticleById($id);
-            $this->articleService->checkArticleOwner($article);
-            $validatedData = $this->articleService->validateArticle(request()->all());
-        } catch (ArticleNotFoundException|ArticleAccessDeniedException $e) {
+        } catch (ArticleNotFoundException $e) {
             return response()->json(['error' => $e->getMessage()], $e->getCode());
-        } catch (ArticleValidationException $e) {
-            return response()->json(['errors' => $e->getErrors()->toArray()], 400);
         }
 
-        $article->setTitle($validatedData['title']);
-        $article->setContent($validatedData['content']);
-
-        #todo вынести в сервис
-        $this->entityManager->flush();
+        $this->articleService->updateArticle($article, $validatedData);
 
         return response()->json(['message' => 'Article is updated', 'article' => $article->getArticleInfo()]);
     }
 
-    // удалить статью
-    public function delete($id)
+    public function delete(int $id): JsonResponse
     {
         try {
             $article = $this->articleService->findArticleById($id);
             $this->articleService->checkArticleOwner($article);
-
         } catch (ArticleNotFoundException|ArticleAccessDeniedException $e) {
             return response()->json(['error' => $e->getMessage()], $e->getCode());
         }
 
-        #todo вынести в сервис
-        $this->entityManager->remove($article);
-        $this->entityManager->flush();
+        $this->articleService->deleteArticle($article);
 
         return response()->json(['message' => 'Article deleted successfully']);
     }

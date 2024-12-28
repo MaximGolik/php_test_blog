@@ -1,49 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
-use App\Entities\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse as JsonResponse;
 
 class RegisterController
 {
-    // метод для регистрации пользователя
-
-    protected $entityManager;
-    // Конструктор контроллера для внедрения зависимости EntityManager
-    public function __construct(EntityManagerInterface $entityManager)
+    protected UserService $userService;
+    #todo привести конструктор к новому формату (не понятно к какому)
+    public function __construct(UserService $userService)
     {
-        $this->entityManager = $entityManager;
+        $this->userService = $userService;
     }
 
-    public function register(Request $request){
-        // валидация пароля и имени пользователя
-        #todo вынести в сервис
-        $validation = Validator::make($request->all(),[
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password'=>'required|min:6|string',
-        ]);
-        if($validation->fails()){
-            return response()->json(['errors'=>$validation->errors()], 400);
-        }
-
-        // создаем пользователя
-        $user = new User();
-        $user->setName($request->input('name'));
-        $user->setEmail($request->input('email'));
-        $user->setPassword(Hash::make($request->input('password')));
-
-        #todo вынести в сервис
-        // сохраняем пользователя в базу данных
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+    public function create(array $data): JsonResponse
+    {
+        $user = $this->userService->createUser($data);
 
         return response()->json([
-            'user'=>$user->getUserInfo(),
+            'user' => $user->getUserInfo(),
         ], 201);
     }
 }
