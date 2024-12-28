@@ -16,8 +16,8 @@ use App\Services\ArticleService;
 #todo вынести всю валидацию и обработку ошибок
 class ArticleController
 {
-    private $entityManager;
-    private $articleService;
+    private EntityManagerInterface $entityManager;
+    private ArticleService $articleService;
 
     public function __construct(EntityManagerInterface $entityManager, ArticleService $articleValidationService)
     {
@@ -29,15 +29,13 @@ class ArticleController
     public function index()
     {
         $articles = $this->articleService->getAllArticles();
-
         return response()->json(['articles' => $articles]);
-
     }
 
     // добавить статью
     public function add()
     {
-        #todo вынести код с пользователем отсюда в сервис
+        #todo вынести код с пользователем отсюда в сервис, поиск по токену
         $user = $this->entityManager->find(User::class, Auth::id());
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -54,6 +52,7 @@ class ArticleController
         $article->setContent($validatedData['content']);
         $article->setUser($user);
 
+        #todo вынести в сервис
         $this->entityManager->persist($article);
         $this->entityManager->flush();
 
@@ -87,6 +86,7 @@ class ArticleController
         $article->setTitle($validatedData['title']);
         $article->setContent($validatedData['content']);
 
+        #todo вынести в сервис
         $this->entityManager->flush();
 
         return response()->json(['message' => 'Article is updated', 'article' => $article->getArticleInfo()]);
@@ -103,6 +103,7 @@ class ArticleController
             return response()->json(['error' => $e->getMessage()], $e->getCode());
         }
 
+        #todo вынести в сервис
         $this->entityManager->remove($article);
         $this->entityManager->flush();
 

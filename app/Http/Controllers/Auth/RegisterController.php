@@ -21,6 +21,7 @@ class RegisterController
 
     public function register(Request $request){
         // валидация пароля и имени пользователя
+        #todo вынести в сервис
         $validation = Validator::make($request->all(),[
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -36,18 +37,13 @@ class RegisterController
         $user->setEmail($request->input('email'));
         $user->setPassword(Hash::make($request->input('password')));
 
+        #todo вынести в сервис
         // сохраняем пользователя в базу данных
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        // генерация токена для авторизации пользователя
-        //  $token = $user->createToken('MyApp')->plainTextToken;
-
-
-        // json(['user' => $user]) не катит, т.к. теперь там все cвойства приватные
         return response()->json([
             'user'=>$user->getUserInfo(),
-//            'token' => $token
         ], 201);
     }
 }

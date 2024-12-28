@@ -11,20 +11,21 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'string')]
-    private $name;
+    private string $name;
 
     #[ORM\Column(type: 'string', unique: true)]
-    private $email;
+    private string $email;
 
     #[ORM\Column(type: 'string')]
-    private $password;
+    private string $password;
 
     // Getters and setters
 
-    public function getUserInfo(){
+    public function getUserInfo(): array
+    {
         return [
             'id' => $this->id,
             'name' => $this->name,
