@@ -14,9 +14,8 @@ use App\Http\Controllers\ArticleController;
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'login']);
 
-// добавил кастомный фильтр
-Route::middleware('check-token')->group(function () {
-
+//todo добавил кастомный фильтр check-token, разобраться как их заставить работать вместе с auth:sanctum
+Route::middleware('auth:sanctum')->group(function () {
     // crud пользователей
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'delete']);
