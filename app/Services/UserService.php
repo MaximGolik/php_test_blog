@@ -1,14 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Entities\User;
-use App\Exceptions\UserAccessTokenException;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Exceptions\UserNotFoundException;
-use App\Exceptions\UserDeleteException;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -20,30 +17,10 @@ class UserService
         $this->entityManager = $entityManager;
     }
 
-    public function findUserById($id): User
+    public function findUserById(int $id): User
     {
         $user = $this->entityManager->find(User::class, $id);
 
-        if (!$user) {
-            throw new UserNotFoundException();
-        }
-
-        return $user;
-    }
-
-    // метод не используется
-    public function findAuthenticatedUser(): User
-    {
-        /*
-         * пока бесполезная обработка из-за дефолтного middleware,
-         * который выкидывает - Route [login] not defined. c некорректным токеном в запросе
-        */
-        $userId = Auth::id();
-        if (!$userId) {
-            throw new UserAccessTokenException();
-        }
-
-        $user = $this->entityManager->find(User::class, $userId);
         if (!$user) {
             throw new UserNotFoundException();
         }
