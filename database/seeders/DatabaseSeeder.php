@@ -2,22 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Database\Factories\ArticleFactory;
+use Database\Factories\UserFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public function run(): void
     {
-        // User::factory(10)->create();
+        for ($i = 0; $i < 10; $i++) {
+            $user = UserFactory::create();
+            $this->entityManager->persist($user);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+            $article = ArticleFactory::create(['user' => $user]);
+            $this->entityManager->persist($article);
+        }
+        $this->entityManager->flush();
+
+        echo "10 статей и пользователей успешно созданы!" . PHP_EOL;
     }
 }

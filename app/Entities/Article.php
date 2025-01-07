@@ -3,11 +3,14 @@
 namespace App\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'articles')]
 class Article
 {
+    use HasFactory;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -19,20 +22,20 @@ class Article
     #[ORM\Column(type: 'text')]
     public $content;
 
-    // Связь с пользователем
-//    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist'], fetch: 'EAGER')]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private $user;
 
-    public function getArticleInfo(){
-        return[
-            'id'=>$this->id,
-            'title'=>$this->title,
-            'content'=>$this->content,
-            'user_id'=>$this->user->getId()
+    public function getArticleInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'content' => $this->content,
+            'user_id' => $this->user->getId()
         ];
     }
+
     public function getUser(): User
     {
         return $this->user;

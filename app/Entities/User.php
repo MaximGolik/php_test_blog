@@ -3,11 +3,15 @@
 namespace App\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
 class User
 {
+
+    use HasFactory;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -32,6 +36,7 @@ class User
             'email' => $this->email,
         ];
     }
+
     public function getId(): int
     {
         return $this->id;

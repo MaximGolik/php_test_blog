@@ -18,6 +18,7 @@
 
 2. Открыть контейнер `docker exec -it laravel_app bash`
 3. Выполнить миграции `php artisan migrate`
+4. (Опционально) Заполнить БД тестовыми данными `php artisan migrate --seed`
 
 ---
 
