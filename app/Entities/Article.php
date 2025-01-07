@@ -20,6 +20,7 @@ class Article
     public $content;
 
     // Связь с пользователем
+//    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist'], fetch: 'EAGER')]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private $user;

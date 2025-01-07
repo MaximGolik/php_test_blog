@@ -18,3 +18,11 @@
 
 2. Открыть контейнер `docker exec -it laravel_app bash`
 3. Выполнить миграции `php artisan migrate`
+
+---
+
+*Redis*
+
+1. Запустить redis cервер локально на ПК `sudo service redis-server start`
+2. Открыть редис `redis-cli` и вбить `ping` - получить обратно `PONG`
+

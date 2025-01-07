@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Entities\Article;
+use App\Exceptions\ArticleNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -18,10 +19,16 @@ class UpdateArticleRequest extends FormRequest
         parent::__construct();
         $this->entityManager = $entityManager;
     }
+
     public function authorize(): bool
     {
         $id = $this->route('id');
         $article = $this->entityManager->find(Article::class, $id);
+
+        if (!$article) {
+            throw new ArticleNotFoundException();
+        }
+
         if ($article->getUser()->getId() !== Auth::id()) {
             return false;
         }
@@ -36,6 +43,7 @@ class UpdateArticleRequest extends FormRequest
             'content' => 'sometimes|string',
         ];
     }
+
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(

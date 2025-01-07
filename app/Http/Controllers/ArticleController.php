@@ -4,58 +4,77 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Services\ArticleServiceInterface;
+use App\Services\DTO\CreateArticleDTO;
+use App\Services\DTO\UpdateArticleDTO;
 use App\Services\UserService;
-use Illuminate\Http\JsonResponse as JsonResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Services\ArticleService;
 
-#todo вынести всю обработку ошибок
 class ArticleController
 {
-    private ArticleService $articleService;
-    private UserService $userService;
-
     public function __construct(
-        ArticleService $articleService,
-        UserService    $userService)
+        private readonly ArticleServiceInterface $articleService,
+        private readonly UserService             $userService
+    )
     {
-        $this->articleService = $articleService;
-        $this->userService = $userService;
     }
 
     public function index(): JsonResponse
     {
         $articles = $this->articleService->getAllArticles();
-        return response()->json(['articles' => $articles]);
+        $articleDTOs = array_map(
+            fn($article) => $this->articleService->toDTO($article),
+            $articles
+        );
+        return response()->json(['articles' => $articleDTOs]);
     }
 
     public function add(array $validatedData): JsonResponse
     {
-        $user = $this->userService->findUserById(Auth::id());
-        $article = $this->articleService->createArticle($validatedData, $user);
+        $createDTO = new CreateArticleDTO(
+            title: $validatedData['title'],
+            content: $validatedData['content']
+        );
 
-        return response()->json(['message' => 'Article added', 'article' => $article->getArticleInfo()]);
+        $user = $this->userService->findUserById(Auth::id());
+        $article = $this->articleService->createArticle($createDTO, $user);
+        $articleDTO = $this->articleService->toDTO($article);
+
+        return response()->json([
+            'message' => 'Article added',
+            'article' => $articleDTO
+        ]);
     }
 
     public function show(int $id): JsonResponse
     {
         $article = $this->articleService->findArticleById($id);
-        return response()->json(['article' => $article->getArticleInfo()]);
+        $articleDTO = $this->articleService->toDTO($article);
+        return response()->json(['article' => $articleDTO]);
     }
 
     public function update(int $id, array $validatedData): JsonResponse
     {
-        $article = $this->articleService->findArticleById($id);
-        $this->articleService->updateArticle($article, $validatedData);
+        $updateDTO = new UpdateArticleDTO(
+            title: $validatedData['title'],
+            content: $validatedData['content']
+        );
 
-        return response()->json(['message' => 'Article is updated', 'article' => $article->getArticleInfo()]);
+        $article = $this->articleService->updateArticle($id, $updateDTO);
+        $articleDTO = $this->articleService->toDTO($article);
+
+        return response()->json([
+            'message' => 'Article is updated',
+            'article' => $articleDTO
+        ]);
     }
 
     public function delete(int $id): JsonResponse
     {
         $article = $this->articleService->findArticleById($id);
         $this->articleService->checkArticleOwner($article);
-        $this->articleService->deleteArticle($article);
+        $this->articleService->deleteArticle($id);
 
         return response()->json(['message' => 'Article deleted successfully']);
     }

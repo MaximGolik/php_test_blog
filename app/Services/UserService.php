@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\User;
+use App\Exceptions\UserNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use Illuminate\Support\Facades\Hash;
 

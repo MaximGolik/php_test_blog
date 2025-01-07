@@ -8,20 +8,21 @@ use App\Entities\Article;
 use App\Entities\User;
 use App\Exceptions\ArticleAccessDeniedException;
 use App\Exceptions\ArticleNotFoundException;
+use App\Services\DTO\ArticleDTO;
+use App\Services\DTO\CreateArticleDTO;
+use App\Services\DTO\UpdateArticleDTO;
 use Doctrine\ORM\EntityManagerInterface;
 use Illuminate\Support\Facades\Auth;
 
-class ArticleService
+class ArticleService implements ArticleServiceInterface
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(
+        private EntityManagerInterface $entityManager
+    )
     {
-        $this->entityManager = $entityManager;
     }
 
-    #todo тут применить декоратор, тут же применить dto
-    public function findArticleById(int $id)
+    public function findArticleById(int $id): Article
     {
         $article = $this->entityManager->find(Article::class, $id);
 
@@ -32,28 +33,17 @@ class ArticleService
         return $article;
     }
 
-    #todo добавить везде типизацию аргументов
-    public function checkArticleOwner(Article $article): void
-    {
-        if ($article->getUser()->getId() !== Auth::id()) {
-            throw new ArticleAccessDeniedException();
-        }
-    }
-
     public function getAllArticles(): array
     {
-        #todo не достает в ответ private и protected переменные в entities, разобраться почему
         $repository = $this->entityManager->getRepository(Article::class);
-        $articles = $repository->findAll();
-
-        return $articles;
+        return $repository->findAll();
     }
 
-    public function createArticle(array $data, User $user): Article
+    public function createArticle(CreateArticleDTO $dto, User $user): Article
     {
         $article = new Article();
-        $article->setTitle($data['title']);
-        $article->setContent($data['content']);
+        $article->setTitle($dto->title);
+        $article->setContent($dto->content);
         $article->setUser($user);
 
         $this->entityManager->persist($article);
@@ -62,17 +52,39 @@ class ArticleService
         return $article;
     }
 
-    public function updateArticle(Article $article, array $data): void
+    public function updateArticle(int $id, UpdateArticleDTO $dto): Article
     {
-        $article->setTitle($data['title']);
-        $article->setContent($data['content']);
+        $article = $this->findArticleById($id);
 
+        $article->setTitle($dto->title);
+        $article->setContent($dto->content);
+
+        $this->entityManager->flush();
+
+        return $article;
+    }
+
+    public function deleteArticle(int $id): void
+    {
+        $article = $this->findArticleById($id);
+        $this->entityManager->remove($article);
         $this->entityManager->flush();
     }
 
-    public function deleteArticle(Article $article): void
+    public function checkArticleOwner(Article $article): void
     {
-        $this->entityManager->remove($article);
-        $this->entityManager->flush();
+        if ($article->getUser()->getId() !== Auth::id()) {
+            throw new ArticleAccessDeniedException();
+        }
+    }
+
+    public function toDTO(Article $article): ArticleDTO
+    {
+        return new ArticleDTO(
+            id: $article->getId(),
+            title: $article->getTitle(),
+            content: $article->getContent(),
+            userId: $article->getUser()->getId(),
+        );
     }
 }

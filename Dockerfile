@@ -1,4 +1,3 @@
-# Используем официальный образ PHP с поддержкой Laravel
 FROM php:8.2-fpm
 
 # Установка системных зависимостей
@@ -13,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     zip \
     libzip-dev \
-    && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
 # Установка Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
