@@ -17,13 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('check-token', [CheckToken::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->renderable(function (Throwable $e, Request $request) {
-            $statusCode = $e->getCode() > 0 ? $e->getCode() : 500;
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => $e->getMessage(),
-                    'code' => $statusCode,
-                ], $statusCode);
-            }
-        });
+//        $exceptions->renderable(function (Throwable $e, Request $request) {
+//            $statusCode = $e->getCode() > 0 ? $e->getCode() : 500;
+//            if ($request->is('api/*')) {
+//                return response()->json([
+//                    'message' => $e->getMessage(),
+//                    'code' => $statusCode,
+//                ], $statusCode);
+//            }
+//        });
     })->create();

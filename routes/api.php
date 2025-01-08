@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 
-#todo подумать куда можно деть singleton и adapter
-
-Route::post('register', static function(RegisterUserRequest $request) {
+Route::post('register', static function (RegisterUserRequest $request) {
     $validated = $request->validated();
     return app(RegisterController::class)->create($validated);
 });
@@ -22,7 +20,7 @@ Route::post('login', [LoginController::class, 'login']);
 
 //todo добавил кастомный фильтр check-token, разобраться как их заставить работать вместе с auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
-    Route::put('/users/{id}', static function(UpdateUserRequest $request, int $id) {
+    Route::put('/users/{id}', static function (UpdateUserRequest $request, int $id) {
         $validated = $request->validated();
         return app(UserController::class)->update($validated, $id);
     });
@@ -40,4 +38,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return app(ArticleController::class)->update($id, $validated);
     });
     Route::delete('/articles/{id}', [ArticleController::class, 'delete']);
+
+    Route::get('/articles/{id}/translate', [ArticleController::class, 'translate']);
 });

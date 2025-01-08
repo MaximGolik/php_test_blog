@@ -7,10 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "deeplcom/deepl-php": "^1.10",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/migrations": "^3.8",
         "doctrine/orm": "^3.3",
         "fakerphp/faker": "^1.24",
+        "guzzlehttp/guzzle": "^7.9",
         "laravel-doctrine/orm": "^3.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
