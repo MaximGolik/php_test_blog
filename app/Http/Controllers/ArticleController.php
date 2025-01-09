@@ -33,7 +33,7 @@ class ArticleController
         return response()->json(['articles' => $articleDTOs]);
     }
 
-    //todo создается dto в контроллере, убрать в отдельный класс
+    //todo создается dto в контроллере, убрать в отдельный класс, спросить надо ли
     public function add(array $validatedData): JsonResponse
     {
         $createDTO = new CreateArticleDTO(

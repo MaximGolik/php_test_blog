@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-use DeepL\DeepLException;
 use DeepL\Translator;
 
 class TranslationService
@@ -10,14 +11,19 @@ class TranslationService
 
     private static ?TranslationService $instance = null;
 
-    private function __construct()
+    private Translator $translator;
+
+    public function __construct(Translator $translator)
     {
+        $this->translator = $translator;
     }
 
+    //todo выглядит как кринж, спросить
     public static function getInstance(): TranslationService
     {
         if (self::$instance === null) {
-            self::$instance = new TranslationService();
+            $translator = new Translator(env('DEEPL_API_KEY'));
+            self::$instance = new TranslationService($translator);
         }
 
         return self::$instance;
@@ -27,9 +33,7 @@ class TranslationService
 
     public function translate(string $text, string $lang = 'ru'): string
     {
-        $translator = new Translator(env('DEEPL_API_KEY'));
-
-        $text = $translator->translateText($text, null, $lang);
+        $text = $this->translator->translateText($text, null, $lang);
         return $text . " (translated to $lang)";
     }
 

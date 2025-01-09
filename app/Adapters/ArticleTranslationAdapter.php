@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Adapters;
 use App\Entities\Article;
 use App\Services\DTO\ArticleDTO;
