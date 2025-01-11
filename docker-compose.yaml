@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/var/www
     ports:
-      - 9000:9000
+      - 9010:9000
     networks:
       - laravel
     depends_on:
@@ -58,6 +58,12 @@ services:
 networks:
   laravel:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
 
 volumes:
   postgres_data:
