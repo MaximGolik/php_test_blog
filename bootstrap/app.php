@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckToken;
+use App\Http\Middleware\HandleExceptionMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,17 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->appendToGroup('check-token', [CheckToken::class]);
+        $middleware->prepend(HandleExceptionMiddleware::class);
     })
-    //todo тут обрабатывать только кастомные исключения, посмотреть можно ли обрабатывать через middleware
     ->withExceptions(function (Exceptions $exceptions) {
-//        $exceptions->renderable(function (Throwable $e, Request $request) {
-//            $statusCode = $e->getCode() > 0 ? $e->getCode() : 500;
-//            if ($request->is('api/*')) {
-//                return response()->json([
-//                    'message' => $e->getMessage(),
-//                    'code' => $statusCode,
-//                ], $statusCode);
-//            }
-//        });
+        // чтобы исключения в laravel 11 обрабатывались в посреднике
+        $exceptions->renderable(function (Throwable $e) {
+            throw $e;
+        });
     })->create();

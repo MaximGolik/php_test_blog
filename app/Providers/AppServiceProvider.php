@@ -2,15 +2,12 @@
 
 namespace App\Providers;
 
-use App\Cache\CustomRedisStore;
 use App\Services\ArticleService;
 use App\Services\ArticleServiceInterface;
 use App\Services\CachedArticleService;
 use App\Services\TranslationService;
 use DeepL\Translator;
 use Doctrine\ORM\EntityManagerInterface;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\ServiceProvider;
 
 

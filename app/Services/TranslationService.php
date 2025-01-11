@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\ArticleNotTranslatedException;
 use DeepL\Translator;
 
 class TranslationService
@@ -28,14 +29,12 @@ class TranslationService
         return self::$instance;
     }
 
-    #todo в докере 504 ошибка, локально ок, разобраться почему
-
     public function translate(string $text, string $lang = 'ru'): string
     {
         try {
             $text = $this->translator->translateText($text, null, $lang);
         } catch (\Throwable $e) {
-            // как-то обработать
+            throw new ArticleNotTranslatedException($e->getMessage());
         }
         return $text . " (translated to $lang)";
     }

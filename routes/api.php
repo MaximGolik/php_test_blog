@@ -18,7 +18,6 @@ Route::post('register', static function (RegisterUserRequest $request) {
 });
 Route::post('login', [LoginController::class, 'login']);
 
-//todo добавил кастомный фильтр check-token, разобраться как их заставить работать вместе с auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/{id}', static function (UpdateUserRequest $request, int $id) {
         $validated = $request->validated();
