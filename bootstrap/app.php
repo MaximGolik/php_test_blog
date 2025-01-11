@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->appendToGroup('check-token', [CheckToken::class]);
     })
+    //todo тут обрабатывать только кастомные исключения, посмотреть можно ли обрабатывать через middleware
     ->withExceptions(function (Exceptions $exceptions) {
 //        $exceptions->renderable(function (Throwable $e, Request $request) {
 //            $statusCode = $e->getCode() > 0 ? $e->getCode() : 500;

@@ -9,11 +9,9 @@ use Illuminate\Http\JsonResponse as JsonResponse;
 
 class RegisterController
 {
-    protected UserService $userService;
-    #todo привести конструктор к новому формату (не понятно к какому)
-    public function __construct(UserService $userService)
+    #todo привести конструктор к новому формату (как тут все остальные сделать)
+    public function __construct(protected UserService $userService)
     {
-        $this->userService = $userService;
     }
 
     public function create(array $data): JsonResponse

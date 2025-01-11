@@ -18,7 +18,6 @@ class TranslationService
         $this->translator = $translator;
     }
 
-    //todo выглядит как кринж, спросить
     public static function getInstance(): TranslationService
     {
         if (self::$instance === null) {
@@ -33,7 +32,11 @@ class TranslationService
 
     public function translate(string $text, string $lang = 'ru'): string
     {
-        $text = $this->translator->translateText($text, null, $lang);
+        try {
+            $text = $this->translator->translateText($text, null, $lang);
+        } catch (\Throwable $e) {
+            // как-то обработать
+        }
         return $text . " (translated to $lang)";
     }
 

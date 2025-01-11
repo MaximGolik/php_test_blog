@@ -14,15 +14,12 @@ class ArticleFactory
 
         $article = new Article();
 
-        // Установка заголовка
         $title = $attributes['title'] ?? $faker->sentence;
         $article->setTitle($title);
 
-        // Установка контента
         $content = $attributes['content'] ?? $faker->paragraphs(3, true);
         $article->setContent($content);
 
-        // Установка пользователя
         $user = $attributes['user'] ?? UserFactory::create();
         $article->setUser($user);
 
