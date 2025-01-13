@@ -13,7 +13,8 @@ class ArticleDTO
         public readonly string $title,
         public readonly string $content,
         public readonly int $userId,
-    ) {}
+    ) {
+    }
 
     public static function fromEntity(Article $article): self
     {

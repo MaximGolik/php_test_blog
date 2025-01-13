@@ -33,7 +33,7 @@ class ArticleController
 
     public function add(array $validatedData): JsonResponse
     {
-        $createDTO = $this->articleRequestTranslator->toCreateArticleDTO($validatedData);
+        $createDTO = $this->articleRequestTranslator->translate($validatedData);
         $user = $this->userService->findUserById(Auth::id());
         $article = $this->articleService->createArticle($createDTO, $user);
         $articleDTO = $this->articleService->toDTO($article);
@@ -53,7 +53,7 @@ class ArticleController
 
     public function update(int $id, array $validatedData): JsonResponse
     {
-        $updateDTO = $this->articleRequestTranslator->toUpdateArticleDTO($validatedData);
+        $updateDTO = $this->articleRequestTranslator->translate($validatedData);
         $article = $this->articleService->updateArticle($id, $updateDTO);
         $articleDTO = $this->articleService->toDTO($article);
 

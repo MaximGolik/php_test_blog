@@ -9,8 +9,7 @@ use App\Entities\User;
 use App\Exceptions\ArticleAccessDeniedException;
 use App\Exceptions\ArticleNotFoundException;
 use App\Services\DTO\ArticleDTO;
-use App\Services\DTO\CreateArticleDTO;
-use App\Services\DTO\UpdateArticleDTO;
+use App\Services\DTO\TranslateArticleDTO;
 use Doctrine\ORM\EntityManagerInterface;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,7 +38,7 @@ class ArticleService implements ArticleServiceInterface
         return $repository->findAll();
     }
 
-    public function createArticle(CreateArticleDTO $dto, User $user): Article
+    public function createArticle(TranslateArticleDTO $dto, User $user): Article
     {
         $article = new Article();
         $article->setTitle($dto->title);
@@ -52,7 +51,7 @@ class ArticleService implements ArticleServiceInterface
         return $article;
     }
 
-    public function updateArticle(int $id, UpdateArticleDTO $dto): Article
+    public function updateArticle(int $id, TranslateArticleDTO $dto): Article
     {
         $article = $this->findArticleById($id);
 
